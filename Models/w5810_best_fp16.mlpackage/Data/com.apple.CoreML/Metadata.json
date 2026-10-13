@@ -1,0 +1,14 @@
+{
+  "MLModelVersionStringKey" : "--",
+  "MLModelDescriptionKey" : "w5810 ONNX model; batch 1; raw logit output.",
+  "MLModelCreatorDefinedKey" : {
+    "source_model" : "w5810_best_fp16.onnx",
+    "com.github.apple.coremltools.conversion_date" : "2026-10-09",
+    "precision" : "fp16",
+    "com.github.apple.coremltools.source" : "milinternal",
+    "com.github.apple.coremltools.version" : "9.0",
+    "deployment_target" : "iOS 26 \/ macOS 26"
+  },
+  "MLModelAuthorKey" : "--",
+  "MLModelLicenseKey" : "--"
+}

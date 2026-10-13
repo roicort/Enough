@@ -1,0 +1,15 @@
+[project]
+name = "python-test"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "zǝʇɹoɔ oɓıɹpoɹ", email = "28023409+roicort@users.noreply.github.com" }
+]
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "coremltools==9.0",
+    "pillow>=12.3.0",
+    "torch>=2.14.1",
+    "transformers>=5.19.0",
+]

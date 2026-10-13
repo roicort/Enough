@@ -1,0 +1,47 @@
+{
+  "extensionName": {
+    "message": "Enough!"
+  },
+  "extensionDescription": {
+    "message": "Locally analyzes images and blurs those classified as AI-generated."
+  },
+  "aiConfidence": {
+    "message": "AI: $1"
+  },
+  "realConfidence": {
+    "message": "Real: $1"
+  },
+  "c2paAIDeclared": {
+    "message": "C2PA: AI declared"
+  },
+  "c2paDigitalCapture": {
+    "message": "C2PA: digital capture"
+  },
+  "c2paUnknownType": {
+    "message": "C2PA: source type not declared"
+  },
+  "c2paUnverified": {
+    "message": "C2PA: absent or unverifiable"
+  },
+  "revealImage": {
+    "message": "View"
+  },
+  "revealImageAccessibility": {
+    "message": "Show image without blur"
+  },
+  "analysisError": {
+    "message": "The background did not return an analysis result."
+  },
+  "downloadError": {
+    "message": "Image download failed with HTTP $1."
+  },
+  "largeImageError": {
+    "message": "Image exceeds the 8 MB local-analysis limit."
+  },
+  "nativeAnalysisError": {
+    "message": "Native image analysis failed."
+  },
+  "thresholdError": {
+    "message": "The native extension did not provide an AI confidence threshold."
+  }
+}

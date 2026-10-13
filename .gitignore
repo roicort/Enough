@@ -1,0 +1,19 @@
+# macOS
+.DS_Store
+
+# Xcode build products and per-user state
+DerivedData/
+build/
+xcuserdata/
+*.xcuserstate
+*.xcscmblueprint
+*.xccheckout
+
+# Swift Package Manager build artifacts
+.build/
+
+# Python virtual environments and bytecode
+.venv/
+__pycache__/
+*.py[cod]
+/Models/capcheck_ai_image_detection.mlpackage/Data

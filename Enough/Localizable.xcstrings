@@ -260,6 +260,22 @@
         }
       }
     },
+    "Capcheck (224 × 224) — Large, slower" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Capcheck (224 × 224) — Large, slower"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Capcheck (224 × 224) — Grande, más lento"
+          }
+        }
+      }
+    },
     "Certificate serial number" : {
       "localizations" : {
         "en" : {
@@ -308,7 +324,11 @@
         }
       }
     },
+    "Could not open the image." : {
+
+    },
     "Could not open the selected image." : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -432,6 +452,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "English"
+          }
+        }
+      }
+    },
+    "Enough on GitHub" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enough on GitHub"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enough en GitHub"
           }
         }
       }
@@ -878,22 +914,6 @@
         }
       }
     },
-    "Enough on GitHub" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enough on GitHub"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enough en GitHub"
-          }
-        }
-      }
-    },
     "Open-source licenses" : {
       "localizations" : {
         "en" : {
@@ -1035,6 +1055,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Mostrar C2PA de IA verificada"
+          }
+        }
+      }
+    },
+    "Sieve (384 × 384) — Small, fast" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sieve (384 × 384) — Small, fast"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sieve (384 × 384) — Pequeño, rápido"
           }
         }
       }
@@ -1200,6 +1236,7 @@
       }
     },
     "The Core ML model could not be found in the app." : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1214,6 +1251,9 @@
           }
         }
       }
+    },
+    "The Core ML model could not be found." : {
+
     },
     "The image is processed locally on this device." : {
       "localizations" : {
@@ -1259,6 +1299,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "El veredicto visual marca IA cuando la confianza alcanza este valor."
+          }
+        }
+      }
+    },
+    "This selection applies only to image analysis in the app." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This selection applies only to image analysis in the app."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta selección solo se aplica al análisis de imágenes en la app."
           }
         }
       }

@@ -38,11 +38,27 @@ enum SharedSettings {
     }
 
     static var aiConfidenceThreshold: Double {
+        defaults.synchronize()
         let threshold = defaults.object(forKey: aiConfidenceThresholdKey) as? Double ?? 0.65
         return min(max(threshold, 0.50), 0.95)
     }
 
-    static var showVerifiedAIC2PA: Bool {
-        defaults.object(forKey: showVerifiedAIC2PAKey) as? Bool ?? true
+    static func setAIConfidenceThreshold(_ threshold: Double) {
+        defaults.set(
+            min(max(threshold, 0.50), 0.95),
+            forKey: aiConfidenceThresholdKey
+        )
+        defaults.synchronize()
     }
+
+    static var showVerifiedAIC2PA: Bool {
+        defaults.synchronize()
+        return defaults.object(forKey: showVerifiedAIC2PAKey) as? Bool ?? true
+    }
+
+    static func setShowVerifiedAIC2PA(_ showVerifiedAIC2PA: Bool) {
+        defaults.set(showVerifiedAIC2PA, forKey: showVerifiedAIC2PAKey)
+        defaults.synchronize()
+    }
+
 }

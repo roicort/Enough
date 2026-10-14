@@ -6,6 +6,10 @@
   "description": "__MSG_extensionDescription__",
   "permissions": ["nativeMessaging"],
   "host_permissions": ["<all_urls>"],
+  "action": {
+    "default_title": "Enough!",
+    "default_popup": "popup.html"
+  },
   "background": {
     "service_worker": "background.js"
   },

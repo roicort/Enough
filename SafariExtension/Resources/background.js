@@ -1,5 +1,5 @@
 const MAXIMUM_IMAGE_BYTES = 8 * 1024 * 1024;
-const ANALYSIS_VERSION = "sieve-visual-v3";
+const MODEL = "sieve";
 const CACHE_DATABASE_NAME = "EnoughImageAnalysis";
 const CACHE_STORE_NAME = "analyses";
 const CACHE_MAXIMUM_ENTRIES = 1_000;
@@ -7,17 +7,30 @@ const CACHE_MAXIMUM_AGE_MS = 30 * 24 * 60 * 60 * 1_000;
 const inFlightAnalyses = new Map();
 
 browser.runtime.onMessage.addListener((message, _sender, sendResponse) => {
-  if (message?.action !== "analyzeImage" || typeof message.url !== "string") {
+  let operation;
+  let wrapsResponse = true;
+  switch (message?.action) {
+  case "analyzeImage":
+    wrapsResponse = false;
+    operation = typeof message.url === "string"
+      ? analyzeImage(message.url)
+      : Promise.reject(new Error(messageText("analysisError")));
+    break;
+  case "popupState":
+    operation = popupState();
+    break;
+  case "clearAnalysisCache":
+    operation = clearAnalysisCache();
+    break;
+  default:
     sendResponse({ error: messageText("analysisError") });
     return false;
   }
-  analyzeImage(message.url)
-    .then(sendResponse)
+
+  operation
+    .then((data) => sendResponse(wrapsResponse ? { data } : data))
     .catch((error) => {
-      console.warn("[Enough] Background image analysis failed", {
-        url: message.url,
-        error
-      });
+      console.warn("[Enough] Background operation failed", { message, error });
       sendResponse({ error: error.message });
     });
   return true;
@@ -35,20 +48,42 @@ async function analyzeImage(url) {
   return inFlightAnalyses.get(url);
 }
 
+async function popupState() {
+  const [settingsResult, cacheResult] = await Promise.allSettled([
+    currentSettings(),
+    cachedAnalysisCount()
+  ]);
+  return {
+    aiConfidenceThreshold: settingsResult.status === "fulfilled"
+      ? settingsResult.value.aiConfidenceThreshold
+      : null,
+    showVerifiedAIC2PA: settingsResult.status === "fulfilled"
+      ? settingsResult.value.showVerifiedAIC2PA
+      : null,
+    cachedAnalyses: cacheResult.status === "fulfilled"
+      ? cacheResult.value
+      : null,
+    settingsError: settingsResult.status === "rejected"
+      ? settingsResult.reason.message
+      : null,
+    cacheError: cacheResult.status === "rejected"
+      ? cacheResult.reason.message
+      : null
+  };
+}
+
+async function clearAnalysisCache() {
+  const database = await openCacheDatabase();
+  const transaction = database.transaction(CACHE_STORE_NAME, "readwrite");
+  const store = transaction.objectStore(CACHE_STORE_NAME);
+  await requestResult(store.clear());
+  await transactionComplete(transaction);
+  database.close();
+  return { cachedAnalyses: 0 };
+}
+
 async function analyzeUncachedImage(url) {
-  let data;
-  try {
-    data = await downloadImage(url);
-  } catch (error) {
-    if (!(error instanceof TypeError)) {
-      throw error;
-    }
-    console.debug(
-      "[Enough] Safari could not download image; using native download",
-      { url, error }
-    );
-    return analyzeRemoteImage(url);
-  }
+  const data = await downloadImage(url);
 
   const imageHash = await sha256(data);
   const cachedAnalysis = await readCachedAnalysis(imageHash);
@@ -82,17 +117,6 @@ async function downloadImage(url) {
     throw new Error(messageText("largeImageError"));
   }
   return data;
-}
-
-async function analyzeRemoteImage(url) {
-  const reply = await sendNativeMessage({
-    action: "analyzeImageURL",
-    url
-  });
-  if (!reply?.success) {
-    throw new Error(reply?.error || messageText("nativeAnalysisError"));
-  }
-  return presentationFor(reply.data);
 }
 
 async function presentationFor(analysis) {
@@ -151,6 +175,16 @@ async function readCachedAnalysis(imageHash) {
   return entry.analysis;
 }
 
+async function cachedAnalysisCount() {
+  const database = await openCacheDatabase();
+  const transaction = database.transaction(CACHE_STORE_NAME, "readonly");
+  const store = transaction.objectStore(CACHE_STORE_NAME);
+  const count = await requestResult(store.count());
+  await transactionComplete(transaction);
+  database.close();
+  return count;
+}
+
 async function cacheAnalysis(imageHash, analysis) {
   const database = await openCacheDatabase();
   const transaction = database.transaction(CACHE_STORE_NAME, "readwrite");
@@ -183,7 +217,7 @@ async function cacheAnalysis(imageHash, analysis) {
 }
 
 function cacheKey(imageHash) {
-  return `${ANALYSIS_VERSION}:${imageHash}`;
+  return `${MODEL}:${imageHash}`;
 }
 
 function openCacheDatabase() {

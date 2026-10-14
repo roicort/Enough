@@ -67,13 +67,16 @@ struct ImageMetadataSection: Identifiable {
 struct C2PAVerification {
     let provenance: C2PAProvenance
     let metadataSection: ImageMetadataSection?
+    let hasManifest: Bool
 
     nonisolated init(
         provenance: C2PAProvenance,
-        metadataSection: ImageMetadataSection?
+        metadataSection: ImageMetadataSection?,
+        hasManifest: Bool = false
     ) {
         self.provenance = provenance
         self.metadataSection = metadataSection
+        self.hasManifest = hasManifest
     }
 }
 
@@ -98,7 +101,8 @@ struct Provenance {
             let manifestJSON = try C2PA.readFile(at: url)
             return C2PAVerification(
                 provenance: classify(manifestJSON: manifestJSON),
-                metadataSection: metadataSection(manifestJSON: manifestJSON)
+                metadataSection: metadataSection(manifestJSON: manifestJSON),
+                hasManifest: true
             )
         } catch {
             return C2PAVerification(provenance: .unknown, metadataSection: nil)

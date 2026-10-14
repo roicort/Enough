@@ -66,8 +66,18 @@ _Enough!_ uses open source pre-trained models.
 
 | Package | Status | Input feature | Input type and shape | Output feature |
 | --- | --- | --- | --- | --- |
-| [`w5810_best_fp16`](./Models/w5810_best_fp16.mlpackage) | Active | `input` | `MLMultiArray`, `Float32[1, 3, 384, 384]` | `logit`, `MLMultiArray Float32[1, 1]` |
-| [`capcheck_ai_image_detection`](./Models/capcheck_ai_image_detection.mlpackage) | Alternative | `input` | Core ML RGB image, `224 × 224` | `logit`, `MLMultiArray Float32[1, 1]` |
+| [`w5810_best_fp16`](./Models/w5810_best_fp16.mlpackage) | App option and Safari — small and fast | `input` | `MLMultiArray`, `Float32[1, 3, 384, 384]` | `logit`, `MLMultiArray Float32[1, 1]` |
+| [`capcheck_ai_image_detection`](./Models/capcheck_ai_image_detection.mlpackage) | App default — large and slower | `input` | Core ML RGB image, `224 × 224` | `logit`, `MLMultiArray Float32[1, 1]` |
+
+In **Settings > Visual detection > Model**, the app can switch between
+Capcheck and Sieve. Capcheck is the default, preserving the existing app
+behavior. Changing the model reanalyzes the selected image. The selection is
+stored only by the app; it does not change the Safari extension, which remains
+on Sieve.
+
+The app and Safari extension load their models with Core ML's `.all`
+compute-unit policy, allowing the framework to select CPU, GPU, and Neural
+Engine execution where supported.
 
 
 ## Safari Extension
@@ -76,6 +86,10 @@ _Enough!_ uses open source pre-trained models.
 
 The Safari extension downloads images already present on the page, analyzes
 them locally, and overlays the result without uploading image data to a server.
+
+Selecting the Enough icon in Safari opens an extension popup with its fixed
+Sieve model, the current AI blur threshold, and the number of cached image
+analyses. The popup can clear the extension's IndexedDB analysis cache.
 
 For images that receive a visual classification, the overlay provides an
 information icon that reveals the same normalized score system as the app on

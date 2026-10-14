@@ -15,17 +15,13 @@ final class SafariWebExtensionHandler: NSObject, NSExtensionRequestHandling {
             let message = item.userInfo?[SFExtensionMessageKey] as? [String: Any],
             let action = message["action"] as? String
         else {
-            complete(context, with: failure("Mensaje de extensión no válido."))
+            complete(context, with: failure("Invalid extension message."))
             return
         }
 
         switch action {
         case "analyzeImage":
             complete(context, with: analyze(message))
-        case "analyzeImageURL":
-            Task {
-                complete(context, with: await analyzeRemoteImage(message))
-            }
         case "settings":
             complete(
                 context,
@@ -36,7 +32,7 @@ final class SafariWebExtensionHandler: NSObject, NSExtensionRequestHandling {
                 ])
             )
         default:
-            complete(context, with: failure("Acción de extensión no compatible."))
+            complete(context, with: failure("Unsupported extension action."))
         }
     }
 
@@ -45,36 +41,12 @@ final class SafariWebExtensionHandler: NSObject, NSExtensionRequestHandling {
             let encodedImage = message["imageBase64"] as? String,
             let imageData = Data(base64Encoded: encodedImage)
         else {
-            return failure("La extensión no pudo leer los datos de la imagen.")
+            return failure("The extension could not read the image data.")
         }
         guard imageData.count <= maximumImageBytes else {
-            return failure("La imagen supera el límite de 8 MB para análisis local.")
+            return failure("The image exceeds the 8 MB limit for local analysis.")
         }
         return analyze(imageData)
-    }
-
-    private func analyzeRemoteImage(_ message: [String: Any]) async -> [String: Any] {
-        guard
-            let urlString = message["url"] as? String,
-            let url = URL(string: urlString),
-            ["http", "https"].contains(url.scheme?.lowercased())
-        else {
-            return failure("La extensión no pudo leer la URL de la imagen.")
-        }
-
-        do {
-            let (imageData, response) = try await URLSession.shared.data(from: url)
-            guard let response = response as? HTTPURLResponse,
-                  (200...299).contains(response.statusCode) else {
-                return failure("La extensión no pudo descargar la imagen.")
-            }
-            guard imageData.count <= maximumImageBytes else {
-                return failure("La imagen supera el límite de 8 MB para análisis local.")
-            }
-            return analyze(imageData)
-        } catch {
-            return failure("La extensión no pudo descargar la imagen: \(error.localizedDescription)")
-        }
     }
 
     private func analyze(_ imageData: Data) -> [String: Any] {
@@ -89,7 +61,8 @@ final class SafariWebExtensionHandler: NSObject, NSExtensionRequestHandling {
         }
 
         do {
-            let visualAnalysis = try AnalysisPipeline().analyze(data: imageData)
+            let image = try Preprocessing.decode(data: imageData)
+            let visualAnalysis = try NeuralClassifier(model: .sieve).analyze(image: image)
             let threshold = SharedSettings.aiConfidenceThreshold
             return success([
                 "shouldBlur": visualAnalysis.confidence >= threshold,

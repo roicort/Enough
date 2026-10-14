@@ -11,25 +11,23 @@ import UIKit
 #endif
 
 struct ContentView: View {
-    @StateObject private var detector = ImageDetector()
+    @StateObject private var pipeline = AnalysisPipeline()
     @State private var selectedPhoto: PhotosPickerItem?
     @State private var isFileImporterPresented = false
 #if os(macOS)
     @State private var isShowingSettings = false
 #endif
     @State private var isDropTargeted = false
-    @AppStorage(
-        SharedSettings.aiConfidenceThresholdKey,
-        store: SharedSettings.defaults
-    ) private var aiConfidenceThreshold = 0.65
+    @State private var aiConfidenceThreshold = SharedSettings.aiConfidenceThreshold
     @AppStorage(
         SharedSettings.appLanguageCodeKey,
         store: SharedSettings.defaults
     ) private var appLanguageCode = "system"
+    @State private var showVerifiedAIC2PA = SharedSettings.showVerifiedAIC2PA
     @AppStorage(
-        SharedSettings.showVerifiedAIC2PAKey,
-        store: SharedSettings.defaults
-    ) private var showVerifiedAIC2PA = true
+        VisualModel.preferenceKey,
+        store: .standard
+    ) private var visualModel = VisualModel.capcheck.rawValue
 
     var body: some View {
         content
@@ -38,7 +36,7 @@ struct ContentView: View {
 #endif
             .task(id: selectedPhoto) {
                 guard let selectedPhoto else { return }
-                await detector.loadAndAnalyze(selectedPhoto)
+                await pipeline.loadAndAnalyze(selectedPhoto)
             }
             .fileImporter(
                 isPresented: $isFileImporterPresented,
@@ -47,16 +45,21 @@ struct ContentView: View {
                 switch result {
                 case let .success(url):
                     Task {
-                        await detector.loadAndAnalyze(url)
+                        await pipeline.loadAndAnalyze(url)
                     }
                 case let .failure(error):
-                    detector.show(error: error)
+                    pipeline.show(error: error)
                 }
             }
             .onChange(of: appLanguageCode) { _, languageCode in
 #if os(macOS)
                 SharedSettings.setAppLanguageCode(languageCode)
 #endif
+            }
+            .onChange(of: visualModel) {
+                Task {
+                    await pipeline.reanalyzeSelectedImage()
+                }
             }
             .onAppear {
 #if os(iOS)
@@ -71,9 +74,10 @@ struct ContentView: View {
         analysisView
             .sheet(isPresented: $isShowingSettings) {
                 SettingsView(
-                    aiConfidenceThreshold: $aiConfidenceThreshold,
+                    aiConfidenceThreshold: aiConfidenceThresholdBinding,
                     appLanguageCode: $appLanguageCode,
-                    showVerifiedAIC2PA: $showVerifiedAIC2PA
+                    showVerifiedAIC2PA: showVerifiedAIC2PABinding,
+                    visualModel: $visualModel
                 )
             }
 #else
@@ -84,15 +88,37 @@ struct ContentView: View {
                 }
 
             SettingsView(
-                aiConfidenceThreshold: $aiConfidenceThreshold,
+                aiConfidenceThreshold: aiConfidenceThresholdBinding,
                 appLanguageCode: $appLanguageCode,
-                showVerifiedAIC2PA: $showVerifiedAIC2PA
+                showVerifiedAIC2PA: showVerifiedAIC2PABinding,
+                visualModel: $visualModel
             )
             .tabItem {
                 Label("Settings", systemImage: "gearshape")
             }
         }
 #endif
+    }
+
+    private var aiConfidenceThresholdBinding: Binding<Double> {
+        Binding(
+            get: { aiConfidenceThreshold },
+            set: { threshold in
+                let clampedThreshold = min(max(threshold, 0.50), 0.95)
+                aiConfidenceThreshold = clampedThreshold
+                SharedSettings.setAIConfidenceThreshold(clampedThreshold)
+            }
+        )
+    }
+
+    private var showVerifiedAIC2PABinding: Binding<Bool> {
+        Binding(
+            get: { showVerifiedAIC2PA },
+            set: { showVerified in
+                showVerifiedAIC2PA = showVerified
+                SharedSettings.setShowVerifiedAIC2PA(showVerified)
+            }
+        )
     }
 
     private var analysisView: some View {
@@ -107,25 +133,25 @@ struct ContentView: View {
                             .frame(maxWidth: .infinity)
                     }
                     .buttonStyle(.borderedProminent)
-                    .disabled(detector.isAnalyzing)
+                    .disabled(pipeline.isAnalyzing)
 
-                    if detector.isAnalyzing {
+                    if pipeline.isAnalyzing {
                         ProgressView("Analyzing image...")
                     }
 
-                    if let result = detector.result {
+                    if let result = pipeline.result {
                         ResultCard(
                             result: result,
                             aiConfidenceThreshold: aiConfidenceThreshold
                         )
                         NavigationLink {
-                            MetadataView(sections: detector.metadataSections)
+                            MetadataView(sections: pipeline.metadataSections)
                         } label: {
                             Label("View metadata", systemImage: "list.bullet.rectangle")
                                 .frame(maxWidth: .infinity)
                         }
                         .buttonStyle(.bordered)
-                    } else if let error = detector.errorMessage {
+                    } else if let error = pipeline.errorMessage {
                         ContentUnavailableView(
                             "Couldn’t analyze the image",
                             systemImage: "exclamationmark.triangle",
@@ -155,7 +181,7 @@ struct ContentView: View {
 
     private var dropZone: some View {
         Group {
-            if let image = detector.previewImage {
+            if let image = pipeline.previewImage {
                 image
                     .resizable()
                     .scaledToFit()
@@ -194,7 +220,7 @@ struct ContentView: View {
                 .stroke(
                     isDropTargeted
                         ? Color.accentColor
-                        : detector.previewImage == nil
+                        : pipeline.previewImage == nil
                             ? Color.secondary
                             : Color.secondary.opacity(0.3),
                     style: StrokeStyle(lineWidth: 2, dash: [8])
@@ -206,14 +232,14 @@ struct ContentView: View {
             perform: loadDroppedItem
         )
         .onTapGesture {
-            guard !detector.isAnalyzing else { return }
+            guard !pipeline.isAnalyzing else { return }
             isFileImporterPresented = true
         }
-        .opacity(detector.isAnalyzing ? 0.1 : 1)
+        .opacity(pipeline.isAnalyzing ? 0.1 : 1)
     }
 
     private func loadDroppedItem(from providers: [NSItemProvider]) -> Bool {
-        guard !detector.isAnalyzing else {
+        guard !pipeline.isAnalyzing else {
             return false
         }
         guard let provider = providers.first(where: {
@@ -228,9 +254,9 @@ struct ContentView: View {
                 data, error in
                 Task { @MainActor in
                     if let data {
-                        await detector.loadAndAnalyze(data)
+                        await pipeline.loadAndAnalyze(data)
                     } else {
-                        detector.show(error: error ?? AnalysisError.unreadableImage)
+                        pipeline.show(error: error ?? AnalysisError.unreadableImage)
                     }
                 }
             }
@@ -239,9 +265,9 @@ struct ContentView: View {
                 item, error in
                 Task { @MainActor in
                     if let url = item as? URL {
-                        await detector.loadAndAnalyze(url)
+                        await pipeline.loadAndAnalyze(url)
                     } else {
-                        detector.show(error: error ?? AnalysisError.unreadableImage)
+                        pipeline.show(error: error ?? AnalysisError.unreadableImage)
                     }
                 }
             }
@@ -276,6 +302,7 @@ private struct SettingsView: View {
     @Binding var aiConfidenceThreshold: Double
     @Binding var appLanguageCode: String
     @Binding var showVerifiedAIC2PA: Bool
+    @Binding var visualModel: String
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
@@ -308,6 +335,18 @@ private struct SettingsView: View {
                     Button("Reset to 65%") {
                         aiConfidenceThreshold = 0.65
                     }
+
+                    Picker("Model", selection: $visualModel) {
+                        Text("Capcheck (224 × 224) — Large, slower")
+                            .tag(VisualModel.capcheck.rawValue)
+                        Text("Sieve (384 × 384) — Small, fast")
+                            .tag(VisualModel.sieve.rawValue)
+                    }
+                    Text(
+                        "This selection applies only to image analysis in the app."
+                    )
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
                 }
 
                 Section("Language") {

@@ -9,10 +9,11 @@
 /* Begin PBXBuildFile section */
 		E1000000000000000000000D /* EnoughSafariExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = E10000000000000000000001 /* EnoughSafariExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		E1000000000000000000000E /* C2PA in Frameworks */ = {isa = PBXBuildFile; productRef = E1000000000000000000000F /* C2PA */; };
-		E10000000000000000000013 /* capcheck_ai_image_detection.mlpackage in Resources */ = {isa = PBXBuildFile; fileRef = F7E64395307A0DCD00C4396B /* capcheck_ai_image_detection.mlpackage */; };
+		E10000000000000000000013 /* w5810_best_fp16.mlpackage in Resources */ = {isa = PBXBuildFile; fileRef = E10000000000000000000018 /* w5810_best_fp16.mlpackage */; };
 		E10000000000000000000016 /* SafariExtension/Resources/_locales in Resources */ = {isa = PBXBuildFile; fileRef = E10000000000000000000017 /* SafariExtension/Resources/_locales */; };
 		F7E64396307A0DCD00C4396B /* capcheck_ai_image_detection.mlpackage in Resources */ = {isa = PBXBuildFile; fileRef = F7E64395307A0DCD00C4396B /* capcheck_ai_image_detection.mlpackage */; };
 		F7E64397307A0DCD00C4396B /* C2PA in Frameworks */ = {isa = PBXBuildFile; productRef = F7E64399307A0DCD00C4396B /* C2PA */; };
+		F7E6439A307A0DCD00C4396B /* w5810_best_fp16.mlpackage in Resources */ = {isa = PBXBuildFile; fileRef = E10000000000000000000018 /* w5810_best_fp16.mlpackage */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -54,6 +55,7 @@
 /* Begin PBXFileReference section */
 		E10000000000000000000001 /* EnoughSafariExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = EnoughSafariExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		E10000000000000000000017 /* SafariExtension/Resources/_locales */ = {isa = PBXFileReference; lastKnownFileType = folder; path = SafariExtension/Resources/_locales; sourceTree = SOURCE_ROOT; };
+		E10000000000000000000018 /* w5810_best_fp16.mlpackage */ = {isa = PBXFileReference; lastKnownFileType = folder.mlpackage; path = w5810_best_fp16.mlpackage; sourceTree = "<group>"; };
 		F7E6436A307749E100C4396B /* Enough.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Enough.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F7E64379307749E300C4396B /* EnoughTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EnoughTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		F7E64383307749E300C4396B /* EnoughUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EnoughUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -133,7 +135,6 @@
 				F7E64386307749E300C4396B /* EnoughUITests */,
 				F7E64394307A0DB600C4396B /* Models */,
 				F7E6436B307749E100C4396B /* Products */,
-				F7F73674307DDCCE0006C14F /* Recovered References */,
 			);
 			sourceTree = "<group>";
 		};
@@ -152,15 +153,9 @@
 			isa = PBXGroup;
 			children = (
 				F7E64395307A0DCD00C4396B /* capcheck_ai_image_detection.mlpackage */,
+				E10000000000000000000018 /* w5810_best_fp16.mlpackage */,
 			);
 			path = Models;
-			sourceTree = "<group>";
-		};
-		F7F73674307DDCCE0006C14F /* Recovered References */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = "Recovered References";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -266,9 +261,19 @@
 				TargetAttributes = {
 					E10000000000000000000003 = {
 						CreatedOnToolsVersion = 27.0;
+						SystemCapabilities = {
+							com.apple.ApplicationGroups.iOS = {
+								enabled = 1;
+							};
+						};
 					};
 					F7E64369307749E100C4396B = {
 						CreatedOnToolsVersion = 27.0;
+						SystemCapabilities = {
+							com.apple.ApplicationGroups.iOS = {
+								enabled = 1;
+							};
+						};
 					};
 					F7E64378307749E300C4396B = {
 						CreatedOnToolsVersion = 27.0;
@@ -310,7 +315,7 @@
 		E10000000000000000000006 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			files = (
-				E10000000000000000000013 /* capcheck_ai_image_detection.mlpackage in Resources */,
+				E10000000000000000000013 /* w5810_best_fp16.mlpackage in Resources */,
 				E10000000000000000000016 /* SafariExtension/Resources/_locales in Resources */,
 			);
 		};
@@ -318,6 +323,7 @@
 			isa = PBXResourcesBuildPhase;
 			files = (
 				F7E64396307A0DCD00C4396B /* capcheck_ai_image_detection.mlpackage in Resources */,
+				F7E6439A307A0DCD00C4396B /* w5810_best_fp16.mlpackage in Resources */,
 			);
 		};
 		F7E64377307749E300C4396B /* Resources */ = {
@@ -380,7 +386,7 @@
 				APPLICATION_EXTENSION_API_ONLY = YES;
 				CODE_SIGN_ENTITLEMENTS = SafariExtension/SafariExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = 8UT45ZUQ4R;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -394,9 +400,10 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 26.0;
-				MARKETING_VERSION = 0.1;
+				MARKETING_VERSION = 0.2;
 				PRODUCT_BUNDLE_IDENTIFIER = xyz.unknowable.Enough.SafariExtension;
 				PRODUCT_NAME = EnoughSafariExtension;
+				REGISTER_APP_GROUPS = YES;
 				SDKROOT = auto;
 				SKIP_INSTALL = YES;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
@@ -414,7 +421,7 @@
 				APPLICATION_EXTENSION_API_ONLY = YES;
 				CODE_SIGN_ENTITLEMENTS = SafariExtension/SafariExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = 8UT45ZUQ4R;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -439,9 +446,10 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 26.0;
-				MARKETING_VERSION = 0.1;
+				MARKETING_VERSION = 0.2;
 				PRODUCT_BUNDLE_IDENTIFIER = xyz.unknowable.Enough.SafariExtension;
 				PRODUCT_NAME = EnoughSafariExtension;
+				REGISTER_APP_GROUPS = YES;
 				SDKROOT = auto;
 				SKIP_INSTALL = YES;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
@@ -496,10 +504,7 @@
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
+				GCC_Preprocessing_DEFINITIONS = "DEBUG=1 $(inherited)";
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
@@ -576,7 +581,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Enough/Enough.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = 8UT45ZUQ4R;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -600,7 +605,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 26.0;
-				MARKETING_VERSION = 0.1;
+				MARKETING_VERSION = 0.2;
 				PRODUCT_BUNDLE_IDENTIFIER = xyz.unknowable.Enough;
 				PRODUCT_NAME = Enough;
 				REGISTER_APP_GROUPS = YES;
@@ -625,7 +630,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Enough/Enough.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = 8UT45ZUQ4R;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -649,7 +654,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 26.0;
-				MARKETING_VERSION = 0.1;
+				MARKETING_VERSION = 0.2;
 				PRODUCT_BUNDLE_IDENTIFIER = xyz.unknowable.Enough;
 				PRODUCT_NAME = Enough;
 				REGISTER_APP_GROUPS = YES;
